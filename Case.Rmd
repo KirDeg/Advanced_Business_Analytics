@@ -1,0 +1,18 @@
+## 1. Multinomial logit model:
+
+Kenneth Train’s exercises using the mlogit package for R
+
+№5, page 5
+
+```{r}
+library("mlogit")
+library('apollo')
+```
+```{r}
+data("Heating", package = "mlogit")
+df <- mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12))
+```
+```{r}
+summary(df)
+```
+
