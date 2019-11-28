@@ -1,6 +1,6 @@
 #  Multinomial logit model:
 
-library("mlogit")
+
 library('apollo')
 
 #### Exercise 4, page 5 ####
