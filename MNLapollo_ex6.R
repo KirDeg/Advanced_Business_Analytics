@@ -3,6 +3,7 @@
 library('apollo')
 
 #### Exercise 6, page 9 ####
+#### Estimate a model with installation costs, operating costs, and alternative specific constants: ####
 
 rm(list = ls())
 
@@ -14,7 +15,7 @@ apollo_initialise()
 
 ### Set core controls
 apollo_control = list(
-  modelName  ="Apollo_mnl_ex4",
+  modelName  ="Apollo_mnl_ex6",
   modelDescr ="example",
   indivID    ="idcase"
 )
