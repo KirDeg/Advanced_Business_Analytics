@@ -2,6 +2,7 @@
 
 
 library('apollo')
+library('mlogit')
 
 #### Exercise 4, page 5 ####
 #### a) How well do the estimated probabilities match the shares of customers choosing each alternative?####
@@ -18,7 +19,8 @@ apollo_initialise()
 apollo_control = list(
   modelName  ="Apollo_mnl_ex4",
   modelDescr ="example",
-  indivID    ="idcase"
+  indivID    ="idcase",
+  panelData = TRUE
 )
 
 # ################################################################# #
@@ -27,13 +29,15 @@ apollo_control = list(
 
 #### Loading data from mlogit package  and preprocessing####
 data("Heating", package = "mlogit")
-database <- Heating
-database <- data.frame(mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12)))
+database <- data.frame(Heating)
 # A list with numeric values of alternatives:
-l1 <- seq(1, length(unique(database$alt)))
-names(l1) <- unique(database$alt)
+l1 <- seq(1, length(unique(database$depvar)))
+names(l1) <- unique(database$depvar)
+# During transformation from mlogit data class into data.frame column depvar tranformed into factor, transform 
+# this factor column into column of characters":
+database$depvar <- as.character(database$depvar)
 # Creating a column with a numeric version of alternatives:
-database$alt_num <- l1[database$alt]
+database$alt_num <- l1[database$depvar]
 
 
 # ################################################################# #
@@ -76,19 +80,19 @@ apollo_probabilities=function(apollo_beta, apollo_inputs, functionality="estimat
   ### List of utilities: these must use the same names as in mnl_settings, order is irrelevant
   V <- list()
   
-  V[['ec']]  <-  c_ec + (ic_coef * ic + oc_coef * oc)
-  V[['er']]  <-  c_er + (ic_coef * ic + oc_coef * oc)
-  V[['gc']]  <-  c_gc + (ic_coef * ic + oc_coef * oc)
-  V[['gr']]  <-  c_gr + (ic_coef * ic + oc_coef * oc)
+  V[['ec']]  <-  c_ec + (ic_coef * ic.ec + oc_coef * oc.ec)
+  V[['er']]  <-  c_er + (ic_coef * ic.er + oc_coef * oc.er)
+  V[['gc']]  <-  c_gc + (ic_coef * ic.gc + oc_coef * oc.gc)
+  V[['gr']]  <-  c_gr + (ic_coef * ic.gr + oc_coef * oc.gr)
   V[['hp']]  <-  0
   
   ### Define settings for mnl:
   mnl_settings = list(
-    alternatives = c(ec=1, er=2, gc=3, gr=4, hp=5),
+    alternatives = c(gc=1, er=2, gr=3, hp=4, ec=5),
     avail        = list(ec=1, er=1, gc=1, gr=1, hp=1),
     choiceVar   = database$alt_num,
     V            = V, 
-    rows = database$depvar
+    estimateRoutine = "maxLik"
   )
   
   
