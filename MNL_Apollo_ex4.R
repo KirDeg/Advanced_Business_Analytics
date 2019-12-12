@@ -84,7 +84,7 @@ apollo_probabilities=function(apollo_beta, apollo_inputs, functionality="estimat
   V[['er']]  <-  c_er + (ic_coef * ic.er + oc_coef * oc.er)
   V[['gc']]  <-  c_gc + (ic_coef * ic.gc + oc_coef * oc.gc)
   V[['gr']]  <-  c_gr + (ic_coef * ic.gr + oc_coef * oc.gr)
-  V[['hp']]  <-  0
+  V[['hp']]  <-  (ic_coef * ic.hp + oc_coef * oc.hp)
   
   ### Define settings for mnl:
   mnl_settings = list(
@@ -151,19 +151,18 @@ apollo_probabilities=function(apollo_beta, apollo_inputs, functionality="estimat
   ### List of utilities: these must use the same names as in mnl_settings, order is irrelevant
   V <- list()
   
-  V[['ec']]  <-  c_ec + (ic_coef * ic + oc_coef * oc)
-  V[['er']]  <-  c_er + (ic_coef * ic + oc_coef * oc)
-  V[['gc']]  <-  c_gc + (ic_coef * ic + oc_coef * oc)
-  V[['gr']]  <-  0
-  V[['hp']]  <-  c_hp + (ic_coef * ic + oc_coef * oc)
+  V[['ec']]  <-  c_ec + (ic_coef * ic.ec + oc_coef * oc.ec)
+  V[['er']]  <-  c_er + (ic_coef * ic.er + oc_coef * oc.er)
+  V[['gc']]  <-  c_gc + (ic_coef * ic.gc + oc_coef * oc.gc)
+  V[['gr']]  <-  (ic_coef * ic.gr + oc_coef * oc.gr)
+  V[['hp']]  <-  c_hp + (ic_coef * ic.hp + oc_coef * oc.hp)
   
   ### Define settings for mnl:
   mnl_settings = list(
-    alternatives = c(ec=1, er=2, gc=3, gr=4, hp=5),
+    alternatives = c(gc=1, er=2, gr=3, hp=4, ec=5),
     avail        = list(ec=1, er=1, gc=1, gr=1, hp=1),
     choiceVar   = database$alt_num,
-    V            = V, 
-    rows = database$depvar
+    V            = V
   )
   
   
