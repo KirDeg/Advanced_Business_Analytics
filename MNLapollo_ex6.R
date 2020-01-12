@@ -17,7 +17,8 @@ apollo_initialise()
 apollo_control = list(
   modelName  ="Apollo_mnl_ex6",
   modelDescr ="example",
-  indivID    ="idcase"
+  indivID    ="idcase",
+  panelData = TRUE
 )
 
 # ################################################################# #
@@ -26,13 +27,15 @@ apollo_control = list(
 
 #### Loading data from mlogit package  and preprocessing####
 data("Heating", package = "mlogit")
-database <- Heating
-database <- data.frame(mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12)))
+database <- data.frame(Heating)
 # A list with numeric values of alternatives:
-l1 <- seq(1, length(unique(database$alt)))
-names(l1) <- unique(database$alt)
+l1 <- seq(1, length(unique(database$depvar)))
+names(l1) <- unique(database$depvar)
+# During transformation from mlogit data class into data.frame column depvar tranformed into factor, transform 
+# this factor column into column of characters":
+database$depvar <- as.character(database$depvar)
 # Creating a column with a numeric version of alternatives:
-database$alt_num <- l1[database$alt]
+database$alt_num <- l1[database$depvar]
 
 
 # ################################################################# #
@@ -75,19 +78,18 @@ apollo_probabilities=function(apollo_beta, apollo_inputs, functionality="estimat
   ### List of utilities: these must use the same names as in mnl_settings, order is irrelevant
   V <- list()
   
-  V[['ec']]  <-  c_ec + (ic_coef * ic + oc_coef * oc)
-  V[['er']]  <-  c_er + (ic_coef * ic + oc_coef * oc)
-  V[['gc']]  <-  c_gc + (ic_coef * ic + oc_coef * oc)
-  V[['gr']]  <-  0
-  V[['hp']]  <-  c_hp + (ic_coef * ic + oc_coef * oc)
+  V[['ec']]  <-  c_ec + (ic_coef * ic.ec + oc_coef * oc.ec)
+  V[['er']]  <-  c_er + (ic_coef * ic.er + oc_coef * oc.er)
+  V[['gc']]  <-  c_gc + (ic_coef * ic.gc + oc_coef * oc.gc)
+  V[['gr']]  <-  (ic_coef * ic.gr + oc_coef * oc.gr)
+  V[['hp']]  <-  c_hp + (ic_coef * ic.hp + oc_coef * oc.hp)
   
   ### Define settings for mnl:
   mnl_settings = list(
-    alternatives = c(ec=1, er=2, gc=3, gr=4, hp=5),
+    alternatives = c(gc=1, er=2, gr=3, hp=4, ec=5),
     avail        = list(ec=1, er=1, gc=1, gr=1, hp=1),
     choiceVar   = database$alt_num,
-    V            = V, 
-    rows = database$depvar
+    V            = V
   )
   
   
@@ -107,16 +109,15 @@ apollo_probabilities=function(apollo_beta, apollo_inputs, functionality="estimat
 # ################################################################# #
 
 model = apollo_estimate(apollo_beta, apollo_fixed, apollo_probabilities, apollo_inputs, 
-                        estimate_settings = list(estimationRoutine = "nr", print.Level = 0))
+                        estimate_settings = list(estimationRoutine = "nr", print.Level = 0, silent = T))
 
 # ----------------------------------------------------------------- #
 #---- FORMATTED OUTPUT (TO SCREEN)                               ----
 # ----------------------------------------------------------------- #
 
-apollo_modelOutput(model, modelOutput_settings = list(printPVal = TRUE, printT1 = TRUE))
+apollo_modelOutput(model)
 
 # Calculate the probabilities for each house explicitly
 fitted_values <- na.omit(data.frame(apollo_prediction(model, apollo_probabilities, apollo_inputs, modelComponent = "model")))
-fitted_values
 
 apply(fitted_values, 2, mean)[4:ncol(fitted_values) - 1]
