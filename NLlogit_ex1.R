@@ -184,7 +184,7 @@ apollo_modelOutput(model)
 
 # b) Test the hypothesis that the log-sum coefficient is 1.0:
 
-(coef(nl)['iv'] - 1) / sqrt(vcov(nl)['iv', 'iv'])
+(coef(model)['lambda'] - 1) / sqrt(vcov(model)['lambda', 'lambda'])
 
 # The critical value of t for 95% confidence is 1.96. So we can reject the hypothesis at 95% confidence.
 # We can also use a likelihood ratio test because the multinomial logit is a special case of the nested model.
