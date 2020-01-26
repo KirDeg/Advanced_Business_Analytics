@@ -68,20 +68,9 @@ for (i in c("icca", "occa")){
 for (j in y_alt){
   if (j %in%  c('gcc', 'ecc', 'erc', 'hpc')){
     database[[paste("inc.cooling", ".", j, sep='')]] <- database[["inc.cooling"]]
-  }
-}
-
-
-for (j in y_alt){
+    database[[paste("int.cooling", ".", j, sep='')]] <- database[["int.cooling"]]}
   if (j %in%  c('erc', 'er')){
     database[[paste("inc.room", ".", j, sep='')]] <- database[["inc.room"]]
-  }
-}
-
-
-for (j in y_alt){
-  if (j %in%  c('gcc', 'ecc', 'erc', 'hpc')){
-    database[[paste("int.cooling", ".", j, sep='')]] <- database[["int.cooling"]]
   }
 }
 
